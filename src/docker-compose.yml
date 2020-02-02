@@ -1,0 +1,43 @@
+# docker-compose.ymlフォーマットのバージョン
+version: '3'
+services:
+  go:
+    build: .
+    command: ["go", "run", "main.go"]
+    # ローカルのsrcをコンテナにマウント
+    volumes:
+      - ./web:/web
+    # コンテナの外部に3000番を公開
+    # 公開するポート番号：コンテナ内部の転送先ポート番号
+    ports:
+      - 8080:8080
+    # dbとwebpackerを先に起動
+    depends_on:
+      - db
+    # pryを使用してデバッグができるよう設定
+    tty: true
+    stdin_open: true
+  # MySQLコンテナ定義
+  db:
+    # mysql8.0でコンテナ作成
+    image: mysql:8.0
+    volumes:
+      # Mysql8.0のデフォルトの認証形式をmysql_native_passwordに設定
+      - ./mysql-confd:/etc/mysql/conf.d
+      # ローカルで保持しているDBをコンテナにマウント
+      - db-volume:/var/lib/mysql
+    # コンテナ内の環境変数を定義
+    environment:
+      # mysqlのルートユーザーのパスワード設定
+      MYSQL_ROOT_PASSWORD: golang
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golang 
+      MYSQL_DATABASE: golang 
+    ports:
+      - "3306:3306"
+    restart: 
+      always
+
+# DBの内容をローカルに保持
+volumes:
+  db-volume:
