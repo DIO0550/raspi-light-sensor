@@ -9,5 +9,9 @@ ADD web/ /web
 
 # mysql のドライバ
 RUN go get github.com/go-sql-driver/mysql;
+# realizeダウンロードしてホットリロードできるようにする
+RUN go get github.com/oxequa/realize
+# migrationツール
+RUN go get github.com/rubenv/sql-migrate/...
 
-EXPOSE 8080
+EXPOSE 8080 5002 3306

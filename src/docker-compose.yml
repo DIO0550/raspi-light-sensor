@@ -2,8 +2,9 @@
 version: '3'
 services:
   go:
+    image: centos7
     build: .
-    command: ["go", "run", "main.go"]
+    command: ["realize", "start"]
     # ローカルのsrcをコンテナにマウント
     volumes:
       - ./web:/web
@@ -11,6 +12,7 @@ services:
     # 公開するポート番号：コンテナ内部の転送先ポート番号
     ports:
       - 8080:8080
+      - 5002:5002
     # dbとwebpackerを先に起動
     depends_on:
       - db
@@ -32,7 +34,7 @@ services:
       MYSQL_ROOT_PASSWORD: golang
       MYSQL_USER: golang
       MYSQL_PASSWORD: golang 
-      MYSQL_DATABASE: golang 
+      MYSQL_DATABASE: golang
     ports:
       - "3306:3306"
     restart: 
