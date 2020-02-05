@@ -1,0 +1,5 @@
+development:
+  dialect: mysql
+  datasource: golang:golang@tcp(172.20.0.1:3306)/golang?parseTime=true
+  dir: ./mysql # ディレクトリを作っておく必要がある
+  table: migrations
