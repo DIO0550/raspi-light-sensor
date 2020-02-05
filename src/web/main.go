@@ -1,26 +1,32 @@
 package main
 
-import(
-    "fmt"
-    "log"
-    "net/http"
-    "net/http/httputil"
+import (
+	"html/template"
+	"log"
+	"net/http"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    dump, err := httputil.DumpRequest(r, true)
-    if err != nil {
-        http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-        return
-    }
-    fmt.Println(string(dump))
-    fmt.Fprintf(w, "<html><body>hello</body></html>\n")
-}
+var templates = make(map[string]*template.Template)
 
 func main() {
-    var httpServer http.Server
-    http.HandleFunc("/", handler)
-    log.Println("start http listening :8080")
-    httpServer.Addr = ":8080"
-    log.Println(httpServer.ListenAndServe())
+	port := "8080"
+	templates["index"] = loadTemplate("index")
+	http.HandleFunc("/", handleIndex)
+	log.Printf("Server listening on port %s", port)
+	log.Print(http.ListenAndServe(":"+port, nil))
+}
+
+func handleIndex(w http.ResponseWriter, r *http.Request) {
+	if err := templates["index"].Execute(w, nil)
+	 err != nil {
+		log.Printf("failed to execute template: %v", err)
+	}
+}
+
+func loadTemplate(templateName string) *template.Template {
+	t, err := template.ParseFiles("template/"+templateName+".html", "template/_header.html", "template/_footer.html")
+	if err != nil {
+		log.Fatalf("template error: %v", err)
+	}
+	return t
 }
