@@ -1,5 +1,5 @@
 # docker-compose.ymlフォーマットのバージョン
-version: '3'
+version: '3.4'
 services:
   go:
     image: centos7
@@ -12,13 +12,14 @@ services:
     # 公開するポート番号：コンテナ内部の転送先ポート番号
     ports:
       - 8080:8080
-      - 5002:5002
-    # dbとwebpackerを先に起動
+    # dbに起動
     depends_on:
       - db
-    # pryを使用してデバッグができるよう設定
     tty: true
     stdin_open: true
+    networks:
+      go_net:
+        ipv4_address: 192.168.0.3
   # MySQLコンテナ定義
   db:
     # mysql8.0でコンテナ作成
@@ -39,7 +40,18 @@ services:
       - "3306:3306"
     restart: 
       always
+    networks:
+      go_net:
+        ipv4_address: 192.168.0.2
 
 # DBの内容をローカルに保持
 volumes:
   db-volume:
+
+# ネットワーク
+networks:
+  go_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
