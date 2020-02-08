@@ -1,11 +1,10 @@
 # golang最新インストール
 FROM golang:latest
 
+WORKDIR /go/src/github.com/
 RUN mkdir /web
-
-WORKDIR /web
-
-ADD web/ /web
+WORKDIR /go/src/github.com/web
+ADD web/ /go/src/github.com/web
 
 # mysql のドライバ
 RUN go get github.com/go-sql-driver/mysql;
