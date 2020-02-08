@@ -1,0 +1,38 @@
+.conference_rooms {
+    text-align: center;
+}
+
+.conference_room {
+    display: inline-flex;
+    justify-content: center;
+    border: solid 5px aquamarine;
+    text-align: center;
+}
+
+.conference_room_name {
+    font-family: "Hiragino Sans", "ヒラギノ角ゴシック", "ＭＳ ゴシック", "MS Gothic";
+    font-weight: 900;
+    display: inline-flex;
+    font-size: 30px;
+    width: 150px;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.usage_situation {
+    font-family: "Hiragino Sans", "ヒラギノ角ゴシック", "ＭＳ ゴシック", "MS Gothic";
+    font-weight: 900;
+    display: inline-flex;
+    font-size: 30px;
+    width: 150px;
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+
+.usage_situation_unused {
+    color: greenyellow;
+}
+
+.usage_situation_used {
+    color: red;
+}

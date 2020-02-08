@@ -1,7 +1,28 @@
-{{template "header" .Header}}
-<div>7A</div>
-<div>6A</div>
-<duv>4A</duv>
-<div>4B</div>
-<div>4D</div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" type="text/css" href="../stylesheet/header.css">
+    <link rel="stylesheet" type="text/css" href="../stylesheet/footer.css">
+    <link rel="stylesheet" type="text/css" href="../stylesheet/{{.Title}}.css">
+</head>
+<body>
+{{template "header"}}
+<div class="conference_rooms">
+    {{range .Data}}
+    <div class="conference_room">
+        <div class="conference_room_name">
+            {{.Name}}
+        </div>
+        {{ if .UsageSituation }}
+            <div class="usage_situation usage_situation_unused">未使用</div>
+        {{ else }}
+            <div class="usage_situation usage_situation_used">使用中</div>
+        {{ end }}
+    </div>
+    {{ end }}
+</div>
 {{template "footer"}}
+</body>
+</html>
