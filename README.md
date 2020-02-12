@@ -1,2 +1,2 @@
-# raspberry-light-sensor
+# raspi-light-sensor
 ラズパイで光センサー
