@@ -68,18 +68,18 @@ func HandleConferenceRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m := map[string]json.RawMessage{}
-    if err := json.Unmarshal(b, &m); err != nil {
+	if err := json.Unmarshal(b, &m); err != nil {
 		http.Error(w, err.Error(), 500)
-        return
+    	return
 	}
 	
 	// 不要なキーの確認
 	for key, _ := range m {
-        if key != "name" && key != "usage_situation" {
+		if key != "name" && key != "usage_situation" {
 			http.Error(w, "不要なキーがある", 500)
 			return
 		}
-    }
+	}
 
 	var room managementDB.UpdateConferenceRoomParam
 	err = json.Unmarshal(b, &room)
