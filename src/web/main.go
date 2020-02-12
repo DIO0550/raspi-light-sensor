@@ -70,7 +70,7 @@ func HandleConferenceRoom(w http.ResponseWriter, r *http.Request) {
 	m := map[string]json.RawMessage{}
 	if err := json.Unmarshal(b, &m); err != nil {
 		http.Error(w, err.Error(), 500)
-    	return
+		return
 	}
 	
 	// 不要なキーの確認
