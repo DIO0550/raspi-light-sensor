@@ -4,14 +4,19 @@ import (
 	"database/sql"
     "fmt"
     "log"
-
+    
     _ "github.com/go-sql-driver/mysql"
 )
 
 type ConferenceRoom struct {
-    Id int
-    Name string
-    UsageSituation bool
+    Id int  `json:"id"`
+    Name string `json:"name"`
+    UsageSituation bool `json:"usage_situation"`
+}
+
+type UpdateConferenceRoomParam struct {
+    Name *string `json:"name"`
+    UsageSituation *bool `json:"usage_situation"`
 }
 
 func ConnectionDB() (*sql.DB, error) {
@@ -51,4 +56,8 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
     }
     
     return
+}
+
+func UpdateConferenceRoomData(roomName string) {
+
 }
