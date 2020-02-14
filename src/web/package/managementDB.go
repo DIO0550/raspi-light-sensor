@@ -14,9 +14,16 @@ type ConferenceRoom struct {
     UsageSituation bool `json:"usage_situation"`
 }
 
+/// ConferenceRoom更新パラメータ
 type UpdateConferenceRoomParam struct {
     Name *string `json:"name"`
     UsageSituation *bool `json:"usage_situation"`
+}
+
+/// ConferenceRoom更新結果
+type UpdateConferenceRoomResult struct {
+    ResultCode string `json:"result_code"`
+    Message string `json:"message"`
 }
 
 func ConnectionDB() (*sql.DB, error) {
@@ -50,7 +57,7 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
         if err != nil {
             log.Printf(err.Error())
             fmt.Println(err)
-            return nil, err;
+            return nil, err
         }
         conferenceRooms = append(conferenceRooms, r)
     }
@@ -58,6 +65,25 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
     return
 }
 
-func UpdateConferenceRoomData(roomName string) {
-
+func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResult UpdateConferenceRoomResult)  {
+    db, err := ConnectionDB()
+    if err != nil {
+        log.Printf(err.Error())
+        fmt.Println(err)
+        updateResult.ResultCode = "001"
+        updateResult.Message = err.Error()
+        return
+    } 
+    defer db.Close()
+    result , err := db.Exec("UPDATE conference_room SET usage_situation = ? WHERE name = ?", usageSituation, roomName)
+    if err != nil {
+        updateResult.ResultCode = "002"
+        updateResult.Message = err.Error()
+        return
+    } 
+        
+    id, _ := result.RowsAffected()
+    updateResult.ResultCode = "000"
+    updateResult.Message = string(id)
+    return
 }

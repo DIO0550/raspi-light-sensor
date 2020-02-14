@@ -27,7 +27,7 @@ func main() {
 
 	http.Handle("/stylesheet/", http.StripPrefix("/stylesheet/", http.FileServer(http.Dir("stylesheet/")))) 
 	http.HandleFunc("/", HandleIndex)
-	http.HandleFunc("/conferenceroom", HandleConferenceRoom)
+	http.HandleFunc("/conferenceroom/update", HandleConferenceRoomUpdate)
 	log.Printf("Server listening on port %s", port)
 	log.Print(http.ListenAndServe(":"+port, nil))
 
@@ -48,7 +48,7 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleConferenceRoom(w http.ResponseWriter, r *http.Request) {
+func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
         http.Error(w, HttpError405, http.StatusMethodNotAllowed)
         return
@@ -91,8 +91,13 @@ func HandleConferenceRoom(w http.ResponseWriter, r *http.Request) {
 	// 必須パラメータチェック
 	if room.Name == nil || room.UsageSituation == nil {
 		http.Error(w, "必須パラメータなし", 500)
-			return
+		return
 	}
+
+	updateResult := managementDB.UpdateConferenceRoomData(*room.Name, *room.UsageSituation)
+	jsonRespose, _ := json.Marshal(updateResult)
+	w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonRespose)
 }
 
 // テンプレートをロードする
