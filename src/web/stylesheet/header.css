@@ -1,3 +1,18 @@
 .title {
     text-align: center;
+    font-size: 80px;
+    color: rgb(64, 115, 224);
+    background: -webkit-linear-gradient(0deg, rgb(64, 115, 224), rgb(64, 224, 211), rgb(69, 224, 64), rgb(255, 217, 0), rgb(255, 123, 0), rgb(255, 0, 0));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    width: 1000px;
+ 
+}
+
+.header-contents {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
