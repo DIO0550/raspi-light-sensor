@@ -14,6 +14,8 @@ var templates = make(map[string]*template.Template)
 const  (
 	HttpError405 string = "405 Method Not Allowed"
 	HttpError415 string = "415 Unsupported Media Type"
+	HttpError500ParameterFormatError string = "500 Parameter format error"
+	HttpError500NoRequiredParameters string = "500 No required parameters"
 )
 
 type TemplateData struct {
@@ -25,9 +27,15 @@ func main() {
 	port := "8080"
 	templates["index"] = LoadTemplate("index")
 
+	// css読み込み
 	http.Handle("/stylesheet/", http.StripPrefix("/stylesheet/", http.FileServer(http.Dir("stylesheet/")))) 
+	
+	// root
 	http.HandleFunc("/", HandleIndex)
-	http.HandleFunc("/conferenceroom/update", HandleConferenceRoomUpdate)
+	
+	// conferenceroom
+	http.HandleFunc("api/conferenceroom/update", HandleConferenceRoomUpdate)
+
 	log.Printf("Server listening on port %s", port)
 	log.Print(http.ListenAndServe(":"+port, nil))
 
@@ -35,19 +43,25 @@ func main() {
 
 // indexのハンドルを返す
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
+	// 存在しないパスなら、404を返す
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return 
+	}
 	rooms, err := managementDB.FetchAllConferenceRoomData()
 	if err != nil {
-		log.Printf(err.Error())
+		http.Error(w, err.Error(), 500)
 	}
 
 	data := TemplateData{Title: "index", Data: rooms}
 
 	if err = templates["index"].Execute(w, data)
 	 err != nil {
-		log.Printf("failed to execute template: %v", err)
+		http.Error(w, err.Error(), 500)
 	}
 }
 
+// ConfrenceRoomUpdateのハンドルを返す
 func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
         http.Error(w, HttpError405, http.StatusMethodNotAllowed)
@@ -76,10 +90,11 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	// 不要なキーの確認
 	for key, _ := range m {
 		if key != "name" && key != "usage_situation" {
-			http.Error(w, "不要なキーがある", 500)
+			http.Error(w, HttpError500ParameterFormatError, 500)
 			return
 		}
 	}
+
 
 	var room managementDB.UpdateConferenceRoomParam
 	err = json.Unmarshal(b, &room)
@@ -90,7 +105,7 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// 必須パラメータチェック
 	if room.Name == nil || room.UsageSituation == nil {
-		http.Error(w, "必須パラメータなし", 500)
+		http.Error(w, HttpError500NoRequiredParameters, 500)
 		return
 	}
 
