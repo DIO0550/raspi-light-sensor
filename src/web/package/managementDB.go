@@ -4,7 +4,7 @@ import (
 	"database/sql"
     "fmt"
     "log"
-    
+    "strconv"
     _ "github.com/go-sql-driver/mysql"
 )
 
@@ -84,6 +84,6 @@ func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResul
         
     id, _ := result.RowsAffected()
     updateResult.ResultCode = "000"
-    updateResult.Message = string(id)
+    updateResult.Message = "chage id=" + string(id) + " value=" + strconv.FormatBool(usageSituation)
     return
 }
