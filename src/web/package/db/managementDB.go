@@ -1,4 +1,4 @@
-package  managementDB
+package db
 
 import (
 	"database/sql"
