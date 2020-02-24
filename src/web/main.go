@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
-	"github.com/web/package"
+	"github.com/web/package/db"
+	"github.com/web/package/converter"
 )
 
 var templates = make(map[string]*template.Template)
@@ -21,6 +22,7 @@ const  (
 type TemplateData struct {
 	Title string
 	Data interface{}
+	DataMap map[string][]db.ConferenceRoom
 }
 
 func main() {
@@ -48,12 +50,33 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return 
 	}
-	rooms, err := managementDB.FetchAllConferenceRoomData()
+	rooms, err := db.FetchAllConferenceRoomData()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
 
-	data := TemplateData{Title: "index", Data: rooms}
+
+	data := TemplateData{Title: "index", Data: rooms, DataMap: map[string][]db.ConferenceRoom{}}
+
+	for _, value := range rooms {
+		name := value.Name
+		number := converter.ExtractNumber(name)
+		log.Print(name)
+		log.Print(number)
+		dataMap := data.DataMap[string(number)]
+		if dataMap == nil {
+			log.Print("data_map == nil")
+			emptySlice := []db.ConferenceRoom{} 
+			emptySlice = append(emptySlice, value) 
+			data.DataMap[string(number)] = emptySlice
+		} else {
+			log.Print("data_map != nil")
+			dataMap = append(dataMap, value)
+			data.DataMap[string(number)] = dataMap
+		}
+	} 
+	
+
 
 	if err = templates["index"].Execute(w, data)
 	 err != nil {
@@ -96,7 +119,7 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	var room managementDB.UpdateConferenceRoomParam
+	var room db.UpdateConferenceRoomParam
 	err = json.Unmarshal(b, &room)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -109,7 +132,7 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateResult := managementDB.UpdateConferenceRoomData(*room.Name, *room.UsageSituation)
+	updateResult := db.UpdateConferenceRoomData(*room.Name, *room.UsageSituation)
 	jsonRespose, _ := json.Marshal(updateResult)
 	w.Header().Set("Content-Type", "application/json")
     w.Write(jsonRespose)
