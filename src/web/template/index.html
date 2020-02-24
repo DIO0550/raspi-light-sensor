@@ -10,19 +10,116 @@
 <body>
 {{template "header"}}
 <div class="conference_rooms">
-    {{range .Data}}
-    <div class="conference_room">
-        <div class="conference_room_name">
-            {{.Name}}
+    <div class="tab_container">
+        <input id="all" type="radio" name="tab_button" checked>
+        <label class="tab_button" for="all">ALL</label>
+
+        {{range $key, $value := .DataMap}}
+            <input id="floor{{$key}}" type="radio" name="tab_button">
+            <label class="tab_button" for="floor{{$key}}">{{$key}}階</label>
+        {{end}}
+
+        <div class="tab_content" id="all_content">
+            <div class="tab_content_description">
+                {{range .Data}}
+                <div class="conference_room">
+                    <div class="conference_room_name">
+                        {{.Name}}
+                    </div>
+                    {{ if .UsageSituation }}
+                    <div class="usage_situation usage_situation_unused">未使用</div>
+                    {{ else }}
+                    <div class="usage_situation usage_situation_used">使用中</div>
+                    {{ end }}
+                </div>
+                {{ end }}
+            </div>
         </div>
-        {{ if .UsageSituation }}
-            <div class="usage_situation usage_situation_unused">未使用</div>
-        {{ else }}
-            <div class="usage_situation usage_situation_used">使用中</div>
+        {{range $key, $value := .DataMap}}
+        <div class="tab_content" id="floor{{$key}}_content">
+            <div class="tab_content_description">
+            {{range $value}}
+                <div class="conference_room">
+                    <div class="conference_room_name">{{.Name}}</div>
+                    {{ if .UsageSituation }}
+                        <div class="usage_situation usage_situation_unused">未使用</div>
+                    {{ else }}
+                        <div class="usage_situation usage_situation_used">使用中</div>
+                    {{ end }}
+                </div>
+            {{ end }}
+            </div>
+        </div>
         {{ end }}
     </div>
-    {{ end }}
 </div>
+<style>
+
+/*タブ切り替え全体のスタイル*/
+.tab_container {
+    padding-bottom: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+}
+
+{{ $length := len .DataMap }}
+.tab_button {
+    width: calc(100%/calc({{$length}} + 1));
+    height: 50px;
+    background-color: #23f5a4;;
+    line-height: 50px;
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    display: block;
+    float: left;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #157550;
+    box-sizing:border-box;
+    transition: all 0.2s ease;
+}
+
+.tab_button:hover {
+    opacity: 0.75;
+}
+
+/*ラジオボタンを全て消す*/
+input[name="tab_button"] {
+    display: none;
+}
+
+/*タブ切り替えの中身のスタイル*/
+.tab_content {
+    display: none;
+    padding: 40px;
+    clear: both;
+    overflow: hidden;
+}
+
+/*選択されているタブのコンテンツのみを表示*/
+#all:checked~#all_content {
+    display: block;
+    border: 1px solid #157550;
+    border-top: 0px solid #157550;
+    box-sizing:border-box;
+}
+
+{{range $key, $value := .DataMap}}
+#floor{{$key}}:checked ~ #floor{{$key}}_content {
+    display: block;
+    border: 1px solid #157550;
+    border-top: 0px solid #157550;
+    box-sizing:border-box;
+}
+{{ end }}
+
+.tab_container input:checked+.tab_button {
+    background-color: white;
+    border-bottom: 0px solid #157550;
+    color: #23f5a4;
+}
+</style>
 {{template "footer"}}
 </body>
 </html>
