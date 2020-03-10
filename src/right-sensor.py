@@ -4,7 +4,7 @@ import urllib.request
 import json
 
 Bright = 60.0
-ConferenceRoomUpdateAPI = "http://localhost:8080/conferenceroom/update"
+ConferenceRoomUpdateAPI = "http://localhost:8080/api/conferenceroom/update"
 adc = MCP3008(channel=0, device=0)
 
 while True:
@@ -16,7 +16,7 @@ while True:
         'Content-Type': 'application/json',
     }
     json_data = json.dumps(param).encode('utf-8')
-    print(json_data) 
+    print(json_data)
     request = urllib.request.Request(ConferenceRoomUpdateAPI, data=json_data, headers=headers, method=method)
     try:
         with urllib.request.urlopen(request) as response:
