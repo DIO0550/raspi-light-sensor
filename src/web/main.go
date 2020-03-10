@@ -25,30 +25,42 @@ type TemplateData struct {
 	DataMap map[string][]db.ConferenceRoom
 }
 
+
 func main() {
 	port := "8080"
 	templates["index"] = LoadTemplate("index")
 
 	// css読み込み
-	http.Handle("/stylesheet/", http.StripPrefix("/stylesheet/", http.FileServer(http.Dir("stylesheet/")))) 
-	
+	http.Handle("/stylesheet/", http.StripPrefix("/stylesheet/", http.FileServer(http.Dir("stylesheet/"))))
+
 	// root
 	http.HandleFunc("/", HandleIndex)
-	
+
 	// conferenceroom
-	http.HandleFunc("api/conferenceroom/update", HandleConferenceRoomUpdate)
+	http.HandleFunc("/api/conferenceroom/update", HandleConferenceRoomUpdate)
+	http.HandleFunc("/api/conferenceroom/fetch", HandleConferenceRoomFetch)
 
 	log.Printf("Server listening on port %s", port)
 	log.Print(http.ListenAndServe(":"+port, nil))
-
 }
+
+
+// テンプレートをロードする
+func LoadTemplate(templateName string) *template.Template {
+	t, err := template.ParseFiles("template/"+templateName+".html", "template/_header.html", "template/_footer.html")
+	if err != nil {
+		log.Fatalf("template error: %v", err)
+	}
+	return t
+}
+
 
 // indexのハンドルを返す
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	// 存在しないパスなら、404を返す
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
-		return 
+		return
 	}
 	rooms, err := db.FetchAllConferenceRoomData()
 	if err != nil {
@@ -66,17 +78,15 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		dataMap := data.DataMap[string(number)]
 		if dataMap == nil {
 			log.Print("data_map == nil")
-			emptySlice := []db.ConferenceRoom{} 
-			emptySlice = append(emptySlice, value) 
+			emptySlice := []db.ConferenceRoom{}
+			emptySlice = append(emptySlice, value)
 			data.DataMap[string(number)] = emptySlice
 		} else {
 			log.Print("data_map != nil")
 			dataMap = append(dataMap, value)
 			data.DataMap[string(number)] = dataMap
 		}
-	} 
-	
-
+	}
 
 	if err = templates["index"].Execute(w, data)
 	 err != nil {
@@ -84,19 +94,20 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 // ConfrenceRoomUpdateのハンドルを返す
 func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-        http.Error(w, HttpError405, http.StatusMethodNotAllowed)
-        return
+		http.Error(w, HttpError405, http.StatusMethodNotAllowed)
+		return
 	}
-	
+
 	if r.Header.Get("Content-Type") != "application/json" {
-    	http.Error(w, HttpError415, http.StatusUnsupportedMediaType)
-    	return
-  	}
-	
-	
+		http.Error(w, HttpError415, http.StatusUnsupportedMediaType)
+		return
+	}
+
+
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -109,7 +120,7 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	
+
 	// 不要なキーの確認
 	for key, _ := range m {
 		if key != "name" && key != "usage_situation" {
@@ -135,14 +146,24 @@ func HandleConferenceRoomUpdate(w http.ResponseWriter, r *http.Request) {
 	updateResult := db.UpdateConferenceRoomData(*room.Name, *room.UsageSituation)
 	jsonRespose, _ := json.Marshal(updateResult)
 	w.Header().Set("Content-Type", "application/json")
-    w.Write(jsonRespose)
+	w.Write(jsonRespose)
 }
 
-// テンプレートをロードする
-func LoadTemplate(templateName string) *template.Template {
-	t, err := template.ParseFiles("template/"+templateName+".html", "template/_header.html", "template/_footer.html")
-	if err != nil {
-		log.Fatalf("template error: %v", err)
+
+// ConfrenceRoomFetchのハンドルを返す
+// DBから取得した会議室の在室状況を返却する
+func HandleConferenceRoomFetch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, HttpError405, http.StatusMethodNotAllowed)
+		return
 	}
-	return t
+
+	rooms, err := db.FetchAllConferenceRoomData()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	jsonRespose, _ := json.Marshal(rooms)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonRespose)
 }
