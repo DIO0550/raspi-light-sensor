@@ -4,7 +4,7 @@ services:
   go:
     image: centos7
     build: .
-    command: ["realize", "start"]
+    command: sh -c "wait-for-it -s db:3306; cd db; sql-migrate up; cd ../; realize start"
     # ローカルのsrcをコンテナにマウント
     volumes:
       - ./web:/go/src/github.com/web
