@@ -8,8 +8,6 @@ services:
     # ローカルのsrcをコンテナにマウント
     volumes:
       - ./web:/go/src/github.com/web
-    # コンテナの外部に3000番を公開
-    # 公開するポート番号：コンテナ内部の転送先ポート番号
     ports:
       - 8080:8080
     # dbに起動
