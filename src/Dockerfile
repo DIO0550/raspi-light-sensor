@@ -1,6 +1,10 @@
 # golang最新インストール
 FROM golang:latest
 
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip
+RUN pip3 install wait-for-it
+
 WORKDIR /go/src/github.com/
 RUN mkdir /web
 WORKDIR /go/src/github.com/web
