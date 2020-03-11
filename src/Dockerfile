@@ -17,4 +17,4 @@ RUN go get github.com/oxequa/realize
 # migrationツール
 RUN go get github.com/rubenv/sql-migrate/...
 
-EXPOSE 8080 5002 3306
+EXPOSE 8080 3306
