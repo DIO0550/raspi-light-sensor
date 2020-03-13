@@ -27,7 +27,7 @@ type UpdateConferenceRoomResult struct {
 }
 
 func ConnectionDB() (*sql.DB, error) {
-    db, err := sql.Open("mysql", "golang:golang@tcp(192.168.0.2:3306)/golang?parseTime=true")
+    db, err := sql.Open("mysql", "golang:golang@tcp(192.168.255.2:3306)/golang?parseTime=true")
     if err != nil {
         log.Printf(err.Error())
         fmt.Println(err)
@@ -41,7 +41,7 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
         log.Printf(err.Error())
         fmt.Println(err)
         return nil, err;
-    } 
+    }
     defer db.Close()
 
     rows, err := db.Query("SELECT * FROM conference_room ORDER BY NAME ASC")
@@ -61,7 +61,7 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
         }
         conferenceRooms = append(conferenceRooms, r)
     }
-    
+
     return
 }
 
@@ -73,15 +73,15 @@ func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResul
         updateResult.ResultCode = "001"
         updateResult.Message = err.Error()
         return
-    } 
+    }
     defer db.Close()
     result , err := db.Exec("UPDATE conference_room SET usage_situation = ? WHERE name = ?", usageSituation, roomName)
     if err != nil {
         updateResult.ResultCode = "002"
         updateResult.Message = err.Error()
         return
-    } 
-        
+    }
+
     id, _ := result.RowsAffected()
     updateResult.ResultCode = "000"
     updateResult.Message = "chage id=" + string(id) + " value=" + strconv.FormatBool(usageSituation)

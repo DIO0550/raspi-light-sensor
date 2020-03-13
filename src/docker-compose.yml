@@ -4,7 +4,7 @@ services:
   go:
     image: centos7
     build: .
-    command: sh -c "wait-for-it -s db:3306; cd db; sql-migrate up; cd ../; realize start"
+    command: sh -c "wait-for-it -s db:3306; sh ./migrate.sh; realize start"
     # ローカルのsrcをコンテナにマウント
     volumes:
       - ./web:/go/src/github.com/web
@@ -17,7 +17,7 @@ services:
     stdin_open: true
     networks:
       go_net:
-        ipv4_address: 192.168.0.3
+        ipv4_address: 192.168.255.3
   # MySQLコンテナ定義
   db:
     # mysql8.0でコンテナ作成
@@ -32,15 +32,15 @@ services:
       # mysqlのルートユーザーのパスワード設定
       MYSQL_ROOT_PASSWORD: golang
       MYSQL_USER: golang
-      MYSQL_PASSWORD: golang 
+      MYSQL_PASSWORD: golang
       MYSQL_DATABASE: golang
     ports:
       - "3306:3306"
-    restart: 
+    restart:
       always
     networks:
       go_net:
-        ipv4_address: 192.168.0.2
+        ipv4_address: 192.168.255.2
 
 # DBの内容をローカルに保持
 volumes:
@@ -52,4 +52,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.0.0/24
+        - subnet: 192.168.255.0/24
