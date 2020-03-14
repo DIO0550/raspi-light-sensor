@@ -1,0 +1,6 @@
+FROM httpd:latest
+
+ADD cors/index.html /var/www/
+COPY cors/httpd.conf /usr/local/apache2/conf
+
+EXPOSE 3035
