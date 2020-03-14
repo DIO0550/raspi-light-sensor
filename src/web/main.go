@@ -17,6 +17,8 @@ const  (
 	HttpError415 string = "415 Unsupported Media Type"
 	HttpError500ParameterFormatError string = "500 Parameter format error"
 	HttpError500NoRequiredParameters string = "500 No required parameters"
+
+	AllowOrigin = "*"
 )
 
 type TemplateData struct {
@@ -164,6 +166,14 @@ func HandleConferenceRoomFetch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonRespose, _ := json.Marshal(rooms)
+	SetUpCORS(w)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonRespose)
+}
+
+// CORS設定
+func SetUpCORS(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", AllowOrigin)
+	w.Header().Set("Access-Control-Allow-Headers","Content-Type")
 }
