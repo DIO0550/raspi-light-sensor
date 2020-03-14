@@ -3,7 +3,9 @@ version: '3.4'
 services:
   go:
     image: centos7
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: sh -c "wait-for-it -s db:3306; sh ./migrate.sh; realize start"
     # ローカルのsrcをコンテナにマウント
     volumes:
@@ -18,6 +20,24 @@ services:
     networks:
       go_net:
         ipv4_address: 192.168.255.3
+  
+  # cors確認用のサーバ
+  cors:
+    build:
+      context: .
+      dockerfile: DockerfileCORS
+    volumes:
+      - ./cors:/var/www
+    ports: 
+      - 3035:3035
+    depends_on:
+      - go
+    tty: true
+    stdin_open: true
+    networks:
+      go_net:
+        ipv4_address: 192.168.255.4
+
   # MySQLコンテナ定義
   db:
     # mysql8.0でコンテナ作成
