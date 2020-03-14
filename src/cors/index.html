@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        var request = new XMLHttpRequest();
+        let URL = "http://localhost:8080/api/conferenceroom/fetch"
+        request.open('GET', URL, true);
+        request.onload = function () {
+            var data = this.response;
+            console.log(data);
+        };
+        request.send();
+    </script>
+</head>
+
+<body>
+    CORSテスト
+</body>
+
+</html>
