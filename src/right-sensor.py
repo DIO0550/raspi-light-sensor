@@ -10,7 +10,7 @@ adc = MCP3008(channel=0, device=0)
 while True:
     brightness = (adc.value * 3.3) * 100
     usage_situation: bool = brightness > Bright
-    param = {"name": "7階D", "usage_situation": usage_situation}
+    param = {"name": "7D", "usage_situation": usage_situation}
     method = "POST"
     headers = {
         'Content-Type': 'application/json',
