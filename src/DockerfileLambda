@@ -1,0 +1,16 @@
+# golang最新インストール
+FROM golang:latest
+
+# mysql のドライバ
+RUN go get github.com/go-sql-driver/mysql;
+# realizeダウンロードしてホットリロードできるようにする
+RUN go get github.com/oxequa/realize
+# AWS用
+RUN go get github.com/aws/aws-lambda-go/lambda
+
+
+# アプリケーション
+WORKDIR /go/src/github.com/
+RUN mkdir /Lambda
+WORKDIR /go/src/github.com/Lambda
+ADD Lambda/ /go/src/github.com/Lambda
