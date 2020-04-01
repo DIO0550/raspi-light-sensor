@@ -1,15 +1,23 @@
 // main.go
 package main
 
-import (
+import ( 
+	"log"
+
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/Lambda/package/db"
 )
 
-func hello() (string, error) {
-	return "Hello ƛ!", nil
+func fetch() ([]db.ConferenceRoom, error) {
+	rooms, err := db.FetchAllConferenceRoomData()
+	if err != nil {
+		log.Printf(err.Error())
+		return nil, err
+	}
+
+	return rooms, nil
 }
 
 func main() {
-	// Make the handler available for Remote Procedure Call by AWS Lambda
-	lambda.Start(hello)
+	lambda.Start(fetch)
 }

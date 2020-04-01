@@ -33,8 +33,7 @@ func ConnectionDB() (*sql.DB, error) {
     Password := os.Getenv("Password")
     Port := os.Getenv("Port")
     EntryPoint := os.Getenv("EntryPoint")
-    connection := User + ":" + Password + "(" + EntryPoint + ":" + Port + ")" + "/" + DBName
- 
+    connection := User + ":" + Password + "@tcp(" + EntryPoint + ":" + Port + ")" + "/" + DBName
     // user:password@tcp(entrypoint:port)/dbname?
     db, err := sql.Open("mysql", connection)
     if err != nil {
@@ -62,7 +61,7 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
 
     for rows.Next() {
         r := ConferenceRoom{}
-        err = rows.Scan(&r.Id, &r.Name, &r.UsageSituation)
+        err = rows.Scan(&r.Id, &r.Name, &r.IsUse)
         if err != nil {
             log.Printf(err.Error())
             fmt.Println(err)
@@ -74,7 +73,7 @@ func FetchAllConferenceRoomData()(conferenceRooms []ConferenceRoom, err error) {
     return
 }
 
-func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResult UpdateConferenceRoomResult)  {
+func UpdateConferenceRoomData(roomName string, IsUse bool) (updateResult UpdateConferenceRoomResult)  {
     db, err := ConnectionDB()
     if err != nil {
         log.Printf(err.Error())
@@ -84,7 +83,7 @@ func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResul
         return
     }
     defer db.Close()
-    result , err := db.Exec("UPDATE conference_room SET usage_situation = ? WHERE name = ?", usageSituation, roomName)
+    result , err := db.Exec("UPDATE conference_room SET usage_situation = ? WHERE name = ?", IsUse, roomName)
     if err != nil {
         updateResult.ResultCode = "002"
         updateResult.Message = err.Error()
@@ -93,6 +92,6 @@ func UpdateConferenceRoomData(roomName string, usageSituation bool) (updateResul
 
     id, _ := result.RowsAffected()
     updateResult.ResultCode = "000"
-    updateResult.Message = "chage id=" + string(id) + " value=" + strconv.FormatBool(usageSituation)
+    updateResult.Message = "chage id=" + string(id) + " value=" + strconv.FormatBool(IsUse)
     return
 }
