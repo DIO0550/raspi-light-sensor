@@ -83,7 +83,7 @@ func UpdateConferenceRoomData(roomName string, IsUse bool) (updateResult UpdateC
         return
     }
     defer db.Close()
-    result , err := db.Exec("UPDATE conference_room SET usage_situation = ? WHERE name = ?", IsUse, roomName)
+    result , err := db.Exec("UPDATE conference_room SET is_use = ? WHERE name = ?", IsUse, roomName)
     if err != nil {
         updateResult.ResultCode = "002"
         updateResult.Message = err.Error()
